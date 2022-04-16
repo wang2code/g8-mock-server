@@ -167,6 +167,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Jenssegers\Mongodb\MongodbServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -192,6 +193,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Mongo' => Jenssegers\Mongodb\MongodbServiceProvider::class,
     ])->toArray(),
 
 ];
