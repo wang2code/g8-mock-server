@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DevController;
+use App\Http\Middleware\GetMockUser;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/dev/mock', [DevController::class, 'mock'])
+        ->middleware([GetMockUser::class]);
