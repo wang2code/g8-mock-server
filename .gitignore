@@ -13,5 +13,5 @@ yarn-error.log
 /.idea
 /.vscode
 /vendor/
-/storage
+#/storage
 .DS_Store
