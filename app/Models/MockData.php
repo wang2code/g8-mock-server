@@ -10,6 +10,23 @@ class MockData extends Model
 
     protected $collection = 'mock';
 
+    public static function getMockData($mock_user, $target_path, $parameters)
+    {
+        $mock_dataset = MockData::getAllAndSortByParamsCount($mock_user, $target_path);
+        foreach ($mock_dataset as $data) {
+            $params_count = count($parameters);
+            foreach ($parameters as $key => $req_value) {
+                if (isset($data->params[$key])) {
+                    $params_count--;
+                }
+            }
+            if ($params_count == 0) {
+                return $data;
+            }
+        }
+        return null;
+    }
+
     public static function getAllAndSortByParamsCount($mock_user, $target_path)
     {
         $raw_aggregate = [

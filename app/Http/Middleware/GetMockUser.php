@@ -17,6 +17,9 @@ class GetMockUser
     {
         $field_name = env('MOCK_USER_FIELDNAME', 'g8_user');
         $mock_user = $_COOKIE[$field_name] ?? "";
+        if (empty($mock_user)) {
+            $mock_user = $request->query($field_name) ?? "";
+        }
 
         $request->attributes->add(['mock_user' => $mock_user]);
 

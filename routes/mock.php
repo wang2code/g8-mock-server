@@ -17,6 +17,6 @@ use App\Http\Controllers\MockController;
 |
 */
 
-Route::any('{any}', MockController::class)
+Route::any('/mock/{any}', MockController::class)
     ->where('any', '.*');
 
