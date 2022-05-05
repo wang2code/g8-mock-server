@@ -97,7 +97,7 @@ class MockController extends Controller
      */
     private function getMockResponse(Request $request, string $mock_user, string $target_path): ?string
     {
-        $mock_data = MockData::getAllAndSortByParamsCount($mock_user, $target_path);
+        $mock_data = MockData::getUserSettingsSortByParamsCount($mock_user, null, $target_path);
 
         //  從參數最多的開始匹配，全部都命中的話 params_count 會等於 0
         //  如果 params_count == 0 表示命中，則回傳

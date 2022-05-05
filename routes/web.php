@@ -19,5 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dev/settings', [DevController::class, 'settings'])
+        ->middleware([GetMockUser::class]);
 Route::get('/dev/mock', [DevController::class, 'mock'])
         ->middleware([GetMockUser::class]);

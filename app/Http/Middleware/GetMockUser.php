@@ -20,7 +20,6 @@ class GetMockUser
         if (empty($mock_user)) {
             $mock_user = $request->query($field_name) ?? "";
         }
-
         $request->attributes->add(['mock_user' => $mock_user]);
 
         return $next($request);

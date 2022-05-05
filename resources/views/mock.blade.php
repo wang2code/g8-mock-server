@@ -9,36 +9,31 @@
             var current_example_data = null;
         @endif
 
-        {{--var fake_dataset = JSON.parse('<?= json_encode($fake_dataset) ?>');--}}
         var fake_dataset = {};
 
         //  修改目前設定
         function onUserDataSelectorChanged() {
-            let path = $('#userMockSettings-select option:selected').val()
-
-            if (path == "separator") {
-                return;
-            }
-
-            let parsed_url = new URL("https://www.pcone.com.tw/"+path);
-            let searches = Array.from(new URLSearchParams(parsed_url.search));
-            let inputs = $("input[name='exist_params[]']");
-
-            for (let i = 0; i < inputs.length; i++) {
-                if (searches.length > i) {
-                    $(inputs[i]).val(searches[i][0]+"="+searches[i][1]);
-                } else {
-                    $(inputs[i]).val("");
-                }
-            }
+            let oid = $('#userMockSettings-select option:selected').val()
+            let path = $('#userMockSettings-select option:selected').text()
 
             $.ajax({
-                method: "POST",
-                {{--url: "/gh/API/GetUserFakeData?device_hash=<?= $device_hash ?>&g8_user=<?= $g8_user ?>",--}}
-                url: '',
-                data: { path: path }
-            }) .done(function(msg) {
-                editor.set(msg.data)
+                method: "GET",
+                url: "/api/GetUserFakeData?{{ env('MOCK_USER_FIELDNAME', 'g8_user') }}={{ $mock_user }}",
+                data: { oid: oid, path: path }
+            }) .done(function(result) {
+                if (result.error) {
+                    alert(`取得已存在資料失敗：${result.error}`);
+                    return;
+                }
+                editor.set(result.data.response);
+                if (result.data.params) {
+                    let inputs = $("input[name='exist_params[]']");
+                    let i = 0;
+                    Object.entries(result.data.params).forEach(([key, value]) => {
+                        $(inputs[i]).val(key+"="+value);
+                        i++;
+                    });
+                }
             });
         }
 
@@ -128,30 +123,26 @@
 
         function onSaveButtonTapped() {
             let isNew = false
-            let path = $('#userMockSettings-select option:selected').val()
+            let oid = $('#userMockSettings-select option:selected').val()
 
             if ($("#newMockCheckbox").is(":checked")) {
                 path = $("#newMockPath").val();
                 isNew = true
             }
-            if (!path || path == "separator") {
-                alert("請(填入|選擇)有效的路徑");
-                return
-            }
-
+            
             let params = $("input[name='exist_params[]']").map(function(){return $(this).val();}).get();
 
             $.ajax({
                 method: "POST",
-                url: "/api/UpdateUserFakeData?{{ env('MOCK_USER_FIELDNAME', 'g8_user') }}}={{ $mock_user }}",
+                url: "/api/UpdateUserFakeData?{{ env('MOCK_USER_FIELDNAME', 'g8_user') }}={{ $mock_user }}",
                 data: {
-                    path: path,
+                    oid: oid,
                     body: editor.getText(),
                     params: params,
                 }
             })
             .done(function(result) {
-                if (result.errMsg) {
+                if (result.error) {
                     alert(`更新失敗：${result.errMsg}`);
                 } else {
                     alert(`更新成功`);
@@ -184,7 +175,7 @@
                     select = select + ',' + sample
                 }
                 searchParams.set("select", select)
-                window.location.search = searchParams.toString();
+                window.history.pushState("", "", location.protocol + '//' + location.host + location.pathname + '?' + searchParams.toString());
             }
         }
 
@@ -274,7 +265,7 @@
                         <input type="text" class="form-control mt-1" name="simple_params[]" placeholder="money=0" >
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control mt-1" name="simple_params[]" placeholder="site=pcone" >
+                        <input type="text" class="form-control mt-1" name="simple_params[]" placeholder="site=localhost" >
                     </div>
                 </div>
             </div>
@@ -300,13 +291,10 @@
                 <select id="userMockSettings-select" class="form-select" onchange="onUserDataSelectorChanged();">
                     <option value="separator">選擇已存在的設定</option>
                     @php
-                    $def_paths = [];
-                    //$def_paths = ["/home/modules", "/initialization", "/initialization/page"];
-                    //$def_paths = array_merge($def_paths, $user_mock_settings);
-                    //$def_paths = array_unique($def_paths);
+                    $def_paths = $mock_user_settings ?? [];
                     @endphp
-                    @foreach ($def_paths as $path) {
-                    <option value="{{ $path }}">{{ $path }}</option>
+                    @foreach ($mock_user_settings as $id => $path)
+                    <option value="{{ $id }}">{{ $path }}</option>
                     @endforeach
                 </select>
                 <div class="mt-3 row">
@@ -323,7 +311,7 @@
                         <input type="text" class="form-control mt-1" name="exist_params[]" placeholder="money=0" >
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control mt-1" name="exist_params[]" placeholder="site=pcone" >
+                        <input type="text" class="form-control mt-1" name="exist_params[]" placeholder="site=localhost" >
                     </div>
                 </div>
             </div>

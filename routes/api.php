@@ -26,3 +26,6 @@ Route::get('/get_samplenames_data', [ApiController::class, "getMockSampleNamesDa
 Route::get('/get_sample_data', [ApiController::class, "getMockSampleData"]);
 Route::post('/UpdateUserFakeData', [ApiController::class, "UpdateUserFakeData"])
         ->middleware([GetMockUser::class]);
+Route::get('/GetUserFakeData', [ApiController::class, "GetUserFakeData"])
+        ->middleware([GetMockUser::class]);
+        

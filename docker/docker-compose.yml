@@ -23,6 +23,7 @@ services:
             - mongo
     mysql:
         image: mysql:8.0.26
+        platform: linux/amd64
         ports:
             - '9093:3306'
         environment:
